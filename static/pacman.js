@@ -8,6 +8,12 @@
  * do proper ghost mechanics (blinky/wimpy etc)
  */
 
+var actionSocket = new WebSocket(
+    'ws://'
+     + window.location.host
+     + '/socket_action/'
+);
+
 var NONE        = 4,
     UP          = 3,
     LEFT        = 2,
@@ -1086,7 +1092,14 @@ var PACMAN = (function () {
         dialog("Press N to Start");
 
         /*Here should go the websocket*/
-        
+
+        actionSocket.send("Hello server");
+
+        actionSocket.onmessage = function(e) {
+            var data = JSON.parse(e.data);
+            console.log(data);
+        };
+
         document.addEventListener("keydown", keyDown, true);
         document.addEventListener("keypress", keyPress, true); 
         
