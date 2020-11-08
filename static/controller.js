@@ -1,6 +1,6 @@
 
-document.addEventListener('DOMContentLoaded', function(event) {
-  if(! /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+document.addEventListener('DOMContentLoaded', function (event) {
+  if (! /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
     document.body.innerHTML = "<div>You need a mobile device to test this functionality!</div>";
     alert("You need a mobile device to test this functionality!");
   }
@@ -12,19 +12,19 @@ document.addEventListener('DOMContentLoaded', function(event) {
 var controllerSocket = null;
 
 function performWebSocket() {
-    var token = document.getElementById("token").value;
-    controllerSocket = new WebSocket(
-        'ws://'
-         + window.location.host
-         + '/controller_action/'
-    );
-    controllerSocket.onopen = () => {
-        controllerSocket.send('token:' + token);
-        var x = document.getElementById("input-token");
-        x.style.display = "none";
-        var controls = document.getElementById("controls");
-        controls.style.display = "block";
-    }
+  var token = document.getElementById("token").value;
+  controllerSocket = new WebSocket(
+    'ws://'
+    + window.location.host
+    + '/controller_action/'
+  );
+  controllerSocket.onopen = () => {
+    controllerSocket.send('token:' + token);
+    var x = document.getElementById("input-token");
+    x.style.display = "none";
+    var controls = document.getElementById("controls");
+    controls.style.display = "block";
+  }
 }
 
 function showCoordinates(event) {
@@ -34,37 +34,37 @@ function showCoordinates(event) {
 }
 
 function turnLeft() {
-    if (controllerSocket.readyState === WebSocket.OPEN) {
-        controllerSocket.send('action:LEFT');
-    }
+  if (controllerSocket.readyState === WebSocket.OPEN) {
+    controllerSocket.send('action:LEFT');
+  }
 }
 
 function turnRight() {
-    if (controllerSocket.readyState === WebSocket.OPEN) {
-        controllerSocket.send('action:RIGHT');
-    }
+  if (controllerSocket.readyState === WebSocket.OPEN) {
+    controllerSocket.send('action:RIGHT');
+  }
 }
 
 function turnUp() {
-    if (controllerSocket.readyState === WebSocket.OPEN) {
-        controllerSocket.send('action:UP');
-    }
+  if (controllerSocket.readyState === WebSocket.OPEN) {
+    controllerSocket.send('action:UP');
+  }
 }
 
 function turnDown() {
-    if (controllerSocket.readyState === WebSocket.OPEN) {
-        controllerSocket.send('action:DOWN');
-    }
+  if (controllerSocket.readyState === WebSocket.OPEN) {
+    controllerSocket.send('action:DOWN');
+  }
 }
 
 function pause() {
-    if (controllerSocket.readyState === WebSocket.OPEN) {
-        controllerSocket.send('action:PAUSE');
-    }
+  if (controllerSocket.readyState === WebSocket.OPEN) {
+    controllerSocket.send('action:PAUSE');
+  }
 }
 
 function start() {
-    if (controllerSocket.readyState === WebSocket.OPEN) {
-        controllerSocket.send('action:START');
-    }
+  if (controllerSocket.readyState === WebSocket.OPEN) {
+    controllerSocket.send('action:START');
+  }
 }

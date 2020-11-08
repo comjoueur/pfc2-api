@@ -21,7 +21,7 @@ from pfc1.core.urls import websocket_urlpatterns as core_ws_patterns
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('pacman/', include('pfc1.core.urls')),
+    path('', include('pfc1.core.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 websocket_urlpatterns = core_ws_patterns
