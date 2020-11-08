@@ -2,10 +2,26 @@
     <head>
         {% load static %}
         <script src="{% static 'controller.js' %}"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
-    <body>
+    <body ontouchstart="showCoordinates(event)" ontouchmove="showCoordinates(event)">
         <h1>Mobile Controller</h1>
-        <input id="token" name="token"/>
-        <button onclick="performWebSocket()">Submit</button>
+        <div id="input-token">
+            <input id="token" name="token"/>
+            <br/>
+            <br/>
+            <button onclick="performWebSocket()">Submit</button>
+        </div>
+        <div id="controls" name="controls" style="display: none;">
+            <br/>
+            <button onclick="turnLeft()">LEFT</button>
+            <button onclick="turnRight()">RIGHT</button>
+            <br/>
+            <button onclick="turnUp()">UP</button>
+            <button onclick="turnDown()">DOWN</button>
+            <br/>
+            <button onclick="start()">START</button>
+            <button onclick="pause()">PAUSE</button>
+        </div>
     </body>
 </html>

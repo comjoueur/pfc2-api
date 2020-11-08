@@ -44,9 +44,9 @@ class ControllerConsumer(WebsocketConsumer):
             self.client = Client.objects.filter(token=data[1]).first()
         elif data[0] == 'action':
             action = {
-                'key': utils.keyCode[utils.START_OPTION],
+                'key': utils.keyCode[data[1]],
             }
-            if self.client.pk:
+            if self.client and self.client.pk:
                 channel_layer = get_channel_layer()
                 async_to_sync(channel_layer.send)(self.client.channel_ws, {
                     'type': 'send_message',
