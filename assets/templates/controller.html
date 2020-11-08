@@ -1,0 +1,11 @@
+<html>
+    <head>
+        {% load static %}
+        <script src="{% static 'controller.js' %}"></script>
+    </head>
+    <body>
+        <h1>Mobile Controller</h1>
+        <input id="token" name="token"/>
+        <button onclick="performWebSocket()">Submit</button>
+    </body>
+</html>

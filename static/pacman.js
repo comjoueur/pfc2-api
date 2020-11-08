@@ -14,6 +14,11 @@ var actionSocket = new WebSocket(
      + '/socket_action/'
 );
 
+window.onbeforeunload = function(evt) {
+    actionSocket.close()
+    return null;
+};
+
 var NONE        = 4,
     UP          = 3,
     LEFT        = 2,
@@ -338,11 +343,15 @@ Pacman.User = function (game, map) {
         resetPosition();
     };        
     
-    function keyDown(e) {
-        if (typeof keyMap[e.keyCode] !== "undefined") { 
+    function keyDown(e, kind=false) {
+        if (typeof keyMap[e.keyCode] !== "undefined" && !kind) {
             due = keyMap[e.keyCode];
             e.preventDefault();
             e.stopPropagation();
+            return false;
+        }
+        else if (typeof keyMap[e.keyCode] !== "undefined" && kind) {
+            due = keyMap[e.keyCode];
             return false;
         }
         return true;
@@ -838,7 +847,8 @@ var PACMAN = (function () {
         startLevel();
     }
 
-    function keyDown(e) {
+    function keyDown(e, kind=false) {
+        console.log(e.keyCode);
         if (e.keyCode === KEY.N) {
             startNewGame();
         } else if (e.keyCode === KEY.S) {
@@ -855,7 +865,7 @@ var PACMAN = (function () {
             map.draw(ctx);
             dialog("Paused");
         } else if (state !== PAUSE) {   
-            return user.keyDown(e);
+            return user.keyDown(e, kind);
         }
         return true;
     }    
@@ -1091,13 +1101,22 @@ var PACMAN = (function () {
 
         dialog("Press N to Start");
 
-        /*Here should go the websocket*/
-
-        actionSocket.send("Hello server");
+        actionSocket.send('token');
 
         actionSocket.onmessage = function(e) {
             var data = JSON.parse(e.data);
             console.log(data);
+            if (!data.token){
+                e = {
+                    keyCode: data.key
+                }
+                keyDown(e, true);
+            }
+            else {
+                var token = null;
+                token = data.token;
+                document.getElementById("token").innerHTML = "Your code for mobile control is " + token;
+            }
         };
 
         document.addEventListener("keydown", keyDown, true);
