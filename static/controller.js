@@ -1,4 +1,6 @@
 
+var width = 0;
+
 document.addEventListener('DOMContentLoaded', function (event) {
   if (! /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
     document.body.innerHTML = "<div>You need a mobile device to test this functionality!</div>";
@@ -10,6 +12,12 @@ document.addEventListener('DOMContentLoaded', function (event) {
 })
 
 var controllerSocket = null;
+var ready = false;
+
+window.onbeforeunload = function (evt) {
+  controllerSocket.close()
+  return null;
+};
 
 function performWebSocket() {
   var token = document.getElementById("token").value;
@@ -24,13 +32,17 @@ function performWebSocket() {
     x.style.display = "none";
     var controls = document.getElementById("controls");
     controls.style.display = "block";
+    ready = true;
   }
 }
 
-function showCoordinates(event) {
+function showCoordinates(event, button_id) {
   var x = event.touches[0].clientX;
   var y = event.touches[0].clientY;
-  console.log(x, y);
+  if (ready) {
+    console.log('touch:' + x + ':' + y + ':' + button_id);
+    controllerSocket.send('touch:' + x + ':' + y + ':' + button_id);
+  }
 }
 
 function turnLeft() {

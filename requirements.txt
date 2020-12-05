@@ -8,6 +8,7 @@ asgiref==3.3.0            # via channels, daphne, django
 attrs==20.3.0             # via automat, service-identity, twisted
 autobahn==20.7.1          # via daphne
 automat==20.2.0           # via twisted
+balanced-kmeans==0.1.0    # via -r requirements.in
 cffi==1.14.3              # via cryptography
 channels==3.0.1           # via -r requirements.in
 click==7.1.2              # via pip-tools
@@ -20,6 +21,9 @@ djangorestframework==3.12.2  # via -r requirements.in
 hyperlink==20.0.1         # via twisted
 idna==2.10                # via hyperlink, twisted
 incremental==17.5.0       # via twisted
+joblib==0.17.0            # via scikit-learn
+kmeans-pytorch==0.3       # via -r requirements.in
+numpy==1.19.4             # via scikit-learn, scipy
 pip-tools==5.3.1          # via -r requirements.in
 pyasn1-modules==0.2.8     # via service-identity
 pyasn1==0.4.8             # via pyasn1-modules, service-identity
@@ -27,9 +31,13 @@ pycparser==2.20           # via cffi
 pyhamcrest==2.0.2         # via twisted
 pyopenssl==19.1.0         # via twisted
 pytz==2020.4              # via django
+scikit-learn==0.23.2      # via sklearn
+scipy==1.5.4              # via scikit-learn
 service-identity==18.1.0  # via twisted
 six==1.15.0               # via automat, cryptography, pip-tools, pyopenssl
+sklearn==0.0              # via -r requirements.in
 sqlparse==0.4.1           # via django
+threadpoolctl==2.1.0      # via scikit-learn
 twisted[tls]==20.3.0      # via daphne
 txaio==20.4.1             # via autobahn
 zope.interface==5.2.0     # via twisted

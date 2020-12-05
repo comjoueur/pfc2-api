@@ -1,0 +1,65 @@
+#left-button {
+    position: absolute;
+    border-radius: 50%;
+    display:block;
+    height: 70px;
+    width: 70px;
+    left: 10px;
+    bottom: 80px;
+    outline: none;
+}
+
+#right-button {
+    position: absolute;
+    border-radius: 50%;
+    display:block;
+    height: 70px;
+    width: 70px;
+    left: 160px;
+    bottom: 80px;
+    outline: none;
+}
+
+#up-button {
+    position: absolute;
+    border-radius: 50%;
+    display:block;
+    height: 70px;
+    width: 70px;
+    left: 85px;
+    bottom:150px;
+    outline: none;
+}
+
+#down-button {
+    position: absolute;
+    border-radius: 50%;
+    display:block;
+    height: 70px;
+    width: 70px;
+    left: 85px;
+    bottom: 10px;
+    outline: none;
+}
+
+#start-button {
+    position: absolute;
+    border-radius: 50%;
+    display:block;
+    height: 70px;
+    width: 70px;
+    right: 20px;
+    bottom: 10px;
+    outline: none;
+}
+
+#pause-button {
+    position: absolute;
+    border-radius: 50%;
+    display:block;
+    height: 70px;
+    width: 70px;
+    right: 20px;
+    bottom: 150px;
+    outline: none;
+}
