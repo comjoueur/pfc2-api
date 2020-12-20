@@ -33,6 +33,13 @@ function performWebSocket() {
     var controls = document.getElementById("controls");
     controls.style.display = "block";
     ready = true;
+    controllerSocket.onmessage = function (e) {
+        var data = JSON.parse(e.data);
+        document.getElementById("up-button").style.left = data['up']['left'] + 'px';
+        document.getElementById("up-button").style.top = data['up']['top'] + 'px';
+        document.getElementById("up-button").style.width = data['up']['width'] + 'px';
+        document.getElementById("up-button").style.height = data['up']['height'] + 'px';
+    }
   }
 }
 

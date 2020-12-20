@@ -5,37 +5,21 @@ import secrets
 from sklearn.cluster import KMeans
 import numpy as np
 
+from pfc1.utils import euclidian_distance
+
 
 class Client(models.Model):
-    TOKEN_SIZE = 8
-    NUM_CLUSTERS = 2
-    CORRECT_WEIGHT = 3
-    INCORRECT_WEIGHT = 1
+    TOKEN_SIZE = 8  # size of client token
+    NUM_CLUSTERS = 1  # default of number of clusters that should be formed
+    CORRECT_WEIGHT = 3  # weight of correct touches
+    INCORRECT_WEIGHT = 1  # weight of incorrect touches
+    MINIMAL_INCORRECT_DISTANCE = 45  # minimal distance to assign a button to incorrect touch
+    NUM_LAST_TOUCHES = 100  # number of maximal last touches to apply the k means
+    ONLY_RELATIVE_BUTTONS = False  # consider all button or only the buttons used
+    MAXIMAL_BUTTON_MOVEMENT = 15  # maximal button movement
 
     channel_ws = models.CharField(max_length=256)
     token = models.CharField(max_length=TOKEN_SIZE, unique=True)
-    center_x = models.IntegerField(default=0)
-    center_y = models.IntegerField(default=0)
-    options_x = models.IntegerField(default=0)
-    options_y = models.IntegerField(default=0)
-
-    @property
-    def center_directionals(self):
-        return self.center_x, self.center_y
-
-    @center_directionals.setter
-    def center_directionals(self, new_center):
-        self.center_x = new_center[0]
-        self.center_y = new_center[1]
-
-    @property
-    def center_options(self):
-        return self.options_x, self.options_y
-
-    @center_options.setter
-    def center_options(self, new_options):
-        self.options_x = new_options[0]
-        self.options_y = new_options[1]
 
     @classmethod
     def generate_valid_client_token(cls):
@@ -47,30 +31,76 @@ class Client(models.Model):
             valid_token = not cls.objects.filter(token=token).exists()
         return token
 
-    def get_centroids(self, weighted=False):
-        touches = self.get_touches_positions(weighted=weighted)
-        if len(touches) < self.NUM_CLUSTERS:
-            return None
-        array_touches = np.array(touches)
-        kmeans = KMeans(n_clusters=self.NUM_CLUSTERS, init='k-means++', random_state=0).fit(array_touches)
-        return kmeans.cluster_centers_
-
-    def get_touches_positions(self, weighted=False):
+    def get_touches_per_button(self, button_touches, weighted=False):
         if weighted:
             touches = []
-            for touch in self.touches.all():
+            for touch in button_touches:
                 touches += [touch.position] * (self.CORRECT_WEIGHT if touch.button else self.INCORRECT_WEIGHT)
             return touches
-        return [touch.position for touch in self.touches.all()]
+        return [touch.position for touch in button_touches]
 
-    def save_centers(self):
-        centers = self.get_centroids()
-        if centers is not None:
-            self.center_directionals = centers[0] if centers[0][0] < centers[1][0] else centers[1]
-            self.center_options = centers[0] if centers[1][0] < centers[0][0] else centers[1]
+    def get_centroid_per_button(self, button_touches, weighted=False, num_clusters=None):
+        clusters = self.NUM_CLUSTERS
+        if num_clusters is not None:
+            clusters = num_clusters
+        touches = self.get_touches_per_button(button_touches, weighted)
+        if len(touches) < clusters:
+            return None
+        array_touches = np.array(touches)
+        kmeans = KMeans(n_clusters=clusters, init='k-means++', random_state=0).fit(array_touches)
+        return kmeans.cluster_centers_
+
+    def get_centroids_last_touches(self, weighted=False, num_clusters=None):
+        touches = self.touches.order_by('-created')[:self.NUM_LAST_TOUCHES]
+        touches_button = {}
+        client_buttons = self.buttons.all()
+        for button in client_buttons:
+            touches_button[button.id] = []
+        for touch in touches:
+            if touch.button:
+                touches_button[touch.button.id].append(touch)
+        centroids = []
+        for button in client_buttons:
+            centroid = self.get_centroid_per_button(touches_button[button.id], weighted, num_clusters)
+            centroids.append((centroid, button))
+        return centroids
+
+    def get_centroids_button_touches(self, weighted=False, num_clusters=None):
+        centroids = []
+        for button in self.buttons.all():
+            touches = button.touches.order_by('-created')[:self.NUM_LAST_TOUCHES]
+            centroid = self.get_centroid_per_button(touches, weighted, num_clusters)
+            centroids.append((centroid, button))
+        return centroids
+
+    def get_centroids(self, weighted=False, num_clusters=None):
+        if self.ONLY_RELATIVE_BUTTONS:
+            return self.get_centroids_last_touches(weighted, num_clusters)
+        return self.get_centroids_button_touches(weighted, num_clusters)
+
+    def update_buttons(self):
+        centroids = self.get_centroids()
+        for centroid, button in centroids:
+            if centroid is not None:
+                button.center = centroid[0]
+                button.save()
+
+    def get_buttons_positions(self):
+        positions = {}
+        for button in self.buttons.all():
+            positions[button.kind] = {
+                'left': button.center[0] - button.size,
+                'top': button.center[1] - button.size,
+                'height': 2 * button.size,
+                'width': 2 * button.size,
+            }
+        return positions
+
+    def __str__(self):
+        return self.token
 
 
-class Touch(models.Model):
+class Button(models.Model):
     BUTTON_LEFT = 'left'
     BUTTON_UP = 'up'
     BUTTON_RIGHT = 'right'
@@ -85,9 +115,38 @@ class Touch(models.Model):
         (BUTTON_START, 'Start Button'),
         (BUTTON_PAUSE, 'Pause Button'),
     ]
+    DEFAULT_POSITION = {
+        BUTTON_LEFT: (45, 245),
+        BUTTON_UP: (120, 175),
+        BUTTON_RIGHT: (195, 245),
+        BUTTON_DOWN: (120, 315),
+        BUTTON_PAUSE: (585, 175),
+        BUTTON_START: (585, 315),
+    }
+    DEFAULT_BUTTON_SIZE = 35
 
-    button = models.CharField(null=True, blank=True, max_length=32, choices=KIND_BUTTON_CHOICES)
+    center_x = models.IntegerField(default=0)
+    center_y = models.IntegerField(default=0)
+    kind = models.CharField(null=True, blank=True, max_length=32, choices=KIND_BUTTON_CHOICES)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='buttons')
+    size = models.IntegerField(default=DEFAULT_BUTTON_SIZE)
+
+    @property
+    def center(self):
+        return self.center_x, self.center_y
+
+    @center.setter
+    def center(self, new_center):
+        self.center_x = new_center[0]
+        self.center_y = new_center[1]
+
+    def __str__(self):
+        return '{}, {}, {}'.format(self.center_x, self.center_y, self.kind)
+
+
+class Touch(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='touches')
+    button = models.ForeignKey(Button, on_delete=models.CASCADE, related_name='touches', null=True)
     position_x = models.IntegerField(default=0)
     position_y = models.IntegerField(default=0)
     created = models.DateTimeField(auto_now_add=True, editable=False)
@@ -101,5 +160,14 @@ class Touch(models.Model):
         self.position_x = new_position[0]
         self.position_y = new_position[1]
 
+    def set_relative_button(self):
+        if not self.button:
+            for button in self.client.buttons.all():
+                if euclidian_distance(button.center, self.position) <= Client.MINIMAL_INCORRECT_DISTANCE ** 2:
+                    self.button = button
+
     def __str__(self):
-        return '{}, {}, {}'.format(self.position_x, self.position_y, self.button)
+        if self.button:
+            return '{}, {}, {}'.format(self.position_x, self.position_y, self.button.kind)
+        else:
+            return '{}, {}'.format(self.position_x, self.position_y)
