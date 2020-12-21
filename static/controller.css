@@ -1,3 +1,8 @@
+body {
+    background-color: #6290C8;
+    color : white;
+}
+
 #left-button {
     position: absolute;
     border-radius: 50%;
@@ -62,4 +67,9 @@
     right: 20px;
     bottom: 150px;
     outline: none;
+}
+
+button:hover {
+    background-color: #623453;
+    color: white
 }

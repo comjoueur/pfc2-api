@@ -35,10 +35,14 @@ function performWebSocket() {
     ready = true;
     controllerSocket.onmessage = function (e) {
         var data = JSON.parse(e.data);
-        document.getElementById("up-button").style.left = data['up']['left'] + 'px';
-        document.getElementById("up-button").style.top = data['up']['top'] + 'px';
-        document.getElementById("up-button").style.width = data['up']['width'] + 'px';
-        document.getElementById("up-button").style.height = data['up']['height'] + 'px';
+        arr = ['up', 'down', 'pause', 'start', 'left', 'right']
+        for(var i = 0; i < 6; i = i + 1){
+            var button_b_id = arr[i] + '-button';
+            document.getElementById(button_b_id).style.left = data[arr[i]]['left'] + 'px';
+            document.getElementById(button_b_id).style.top = data[arr[i]]['top'] + 'px';
+            document.getElementById(button_b_id).style.width = data[arr[i]]['width'] + 'px';
+            document.getElementById(button_b_id).style.height = data[arr[i]]['height'] + 'px';
+        }
     }
   }
 }

@@ -5,7 +5,7 @@ import secrets
 from sklearn.cluster import KMeans
 import numpy as np
 
-from pfc1.utils import euclidian_distance
+from pfc1.utils import euclidian_distance, get_point_proyection
 
 
 class Client(models.Model):
@@ -13,10 +13,12 @@ class Client(models.Model):
     NUM_CLUSTERS = 1  # default of number of clusters that should be formed
     CORRECT_WEIGHT = 3  # weight of correct touches
     INCORRECT_WEIGHT = 1  # weight of incorrect touches
-    MINIMAL_INCORRECT_DISTANCE = 45  # minimal distance to assign a button to incorrect touch
+    MINIMAL_INCORRECT_DISTANCE = 10  # minimal distance to assign a button to incorrect touch
     NUM_LAST_TOUCHES = 100  # number of maximal last touches to apply the k means
     ONLY_RELATIVE_BUTTONS = False  # consider all button or only the buttons used
     MAXIMAL_BUTTON_MOVEMENT = 15  # maximal button movement
+    BUTTON_GROWING = (1.5) ** 0.5
+    NUM_BUTTON_GROWING = 2
 
     channel_ws = models.CharField(max_length=256)
     token = models.CharField(max_length=TOKEN_SIZE, unique=True)
@@ -78,12 +80,37 @@ class Client(models.Model):
             return self.get_centroids_last_touches(weighted, num_clusters)
         return self.get_centroids_button_touches(weighted, num_clusters)
 
+    def get_sizes(self):
+        touches = self.touches.order_by('-created')[:self.NUM_LAST_TOUCHES]
+        if len(touches) > 0:
+            touches_button = {}
+            client_buttons = self.buttons.all()
+            for button in client_buttons:
+                touches_button[button.id] = 0
+            for touch in touches:
+                if touch.button:
+                    touches_button[touch.button.id] += 1
+            return [w for w in sorted(touches_button, key=touches_button.get, reverse=True)
+                    if touches_button[w] > 2][:self.NUM_BUTTON_GROWING]
+        return []
+
+
     def update_buttons(self):
         centroids = self.get_centroids()
         for centroid, button in centroids:
             if centroid is not None:
-                button.center = centroid[0]
+                default_center = button.get_default_center()
+                button.center = get_point_proyection(default_center, centroid[0], self.MAXIMAL_BUTTON_MOVEMENT)
                 button.save()
+        button_ids = self.get_sizes()
+        if len(button_ids):
+            for button in self.buttons.all():
+                if button.id in button_ids:
+                    button.size = button.DEFAULT_BUTTON_SIZE * self.BUTTON_GROWING
+                else:
+                    button.size = button.DEFAULT_BUTTON_SIZE
+                button.save()
+        print(self.get_sizes())
 
     def get_buttons_positions(self):
         positions = {}
@@ -140,6 +167,9 @@ class Button(models.Model):
         self.center_x = new_center[0]
         self.center_y = new_center[1]
 
+    def get_default_center(self):
+        return self.DEFAULT_POSITION[self.kind]
+
     def __str__(self):
         return '{}, {}, {}'.format(self.center_x, self.center_y, self.kind)
 
@@ -163,7 +193,8 @@ class Touch(models.Model):
     def set_relative_button(self):
         if not self.button:
             for button in self.client.buttons.all():
-                if euclidian_distance(button.center, self.position) <= Client.MINIMAL_INCORRECT_DISTANCE ** 2:
+                distance = button.size + Client.MINIMAL_INCORRECT_DISTANCE
+                if euclidian_distance(button.center, self.position) <= distance ** 2:
                     self.button = button
 
     def __str__(self):
