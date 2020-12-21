@@ -24,7 +24,7 @@ def euclidian_distance(p1, p2):
 
 
 def get_point_proyection(center, point, distance):
-    if euclidian_distance(center, point) <=distance ** 2:
+    if euclidian_distance(center, point) <= distance ** 2:
         return point
     else:
         x = point[0] - center[0]

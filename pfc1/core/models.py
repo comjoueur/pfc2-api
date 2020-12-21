@@ -17,8 +17,8 @@ class Client(models.Model):
     NUM_LAST_TOUCHES = 100  # number of maximal last touches to apply the k means
     ONLY_RELATIVE_BUTTONS = False  # consider all button or only the buttons used
     MAXIMAL_BUTTON_MOVEMENT = 15  # maximal button movement
-    BUTTON_GROWING = (1.5) ** 0.5
-    NUM_BUTTON_GROWING = 2
+    BUTTON_GROWING = 1.3 ** 0.5  # button growing ratio
+    NUM_BUTTON_GROWING = 2  # num of  buttons to grow
 
     channel_ws = models.CharField(max_length=256)
     token = models.CharField(max_length=TOKEN_SIZE, unique=True)
@@ -94,7 +94,6 @@ class Client(models.Model):
                     if touches_button[w] > 2][:self.NUM_BUTTON_GROWING]
         return []
 
-
     def update_buttons(self):
         centroids = self.get_centroids()
         for centroid, button in centroids:
@@ -110,7 +109,6 @@ class Client(models.Model):
                 else:
                     button.size = button.DEFAULT_BUTTON_SIZE
                 button.save()
-        print(self.get_sizes())
 
     def get_buttons_positions(self):
         positions = {}
@@ -150,7 +148,7 @@ class Button(models.Model):
         BUTTON_PAUSE: (585, 175),
         BUTTON_START: (585, 315),
     }
-    DEFAULT_BUTTON_SIZE = 35
+    DEFAULT_BUTTON_SIZE = 35  # Default button circular ratio
 
     center_x = models.IntegerField(default=0)
     center_y = models.IntegerField(default=0)
