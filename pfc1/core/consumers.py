@@ -75,7 +75,7 @@ class ControllerConsumer(WebsocketConsumer):
             if button is None:
                 touch.set_relative_button()
                 touch.save()
-            if self.client.touches.count() % 30 == 0:
+            if self.client.touches.count() % 30 == 0 and Client.ADAPTATION_MODE:
                 self.client.update_buttons()
                 button_positions = self.client.get_buttons_positions()
                 if button_positions:

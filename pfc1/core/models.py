@@ -19,6 +19,7 @@ class Client(models.Model):
     MAXIMAL_BUTTON_MOVEMENT = 15  # maximal button movement
     BUTTON_GROWING = 1.3 ** 0.5  # button growing ratio
     NUM_BUTTON_GROWING = 2  # num of  buttons to grow
+    ADAPTATION_MODE = True  # enable adaptation
 
     channel_ws = models.CharField(max_length=256)
     token = models.CharField(max_length=TOKEN_SIZE, unique=True)
