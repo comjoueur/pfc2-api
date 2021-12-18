@@ -1,6 +1,6 @@
 
 from django.contrib import admin
-from pfc1.core.models import Client, Touch, Button
+from pfc2.core.models import Client, Touch, Button
 
 
 @admin.register(Client)

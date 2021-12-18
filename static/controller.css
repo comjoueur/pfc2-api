@@ -1,5 +1,5 @@
 body {
-    background-color: #6290C8;
+    background-color: #f4f8ff;
     color : white;
 }
 
@@ -12,6 +12,12 @@ body {
     left: 10px;
     bottom: 80px;
     outline: none;
+    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2);
+    background: #fcd069;
+    color: white !important;
+    font-weight: 700;
+    font-size : 15px;
+    border: 2px solid #CDCDCD;
 }
 
 #right-button {
@@ -23,6 +29,12 @@ body {
     left: 160px;
     bottom: 80px;
     outline: none;
+    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2);
+    background: #fcd069;
+    color: white !important;
+    font-weight: 700;
+    font-size : 15px;
+    border: 2px solid #CDCDCD;
 }
 
 #up-button {
@@ -34,6 +46,12 @@ body {
     left: 85px;
     bottom:150px;
     outline: none;
+    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2);
+    background: #fcd069;
+    color: white !important;
+    font-weight: 700;
+    font-size : 15px;
+    border: 2px solid #CDCDCD;
 }
 
 #down-button {
@@ -45,6 +63,12 @@ body {
     left: 85px;
     bottom: 10px;
     outline: none;
+    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2);
+    background: #fcd069;
+    color: white !important;
+    font-weight: 700;
+    font-size : 15px;
+    border: 2px solid #CDCDCD;
 }
 
 #start-button {
@@ -56,6 +80,12 @@ body {
     right: 20px;
     bottom: 10px;
     outline: none;
+    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2);
+    background: rgb(89, 133, 234);
+    color: white !important;
+    font-weight: 700;
+    font-size : 15px;
+    border: 2px solid #CDCDCD;
 }
 
 #pause-button {
@@ -67,9 +97,19 @@ body {
     right: 20px;
     bottom: 150px;
     outline: none;
+    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2);
+    background: rgb(89, 133, 234);
+    color: white !important;
+    font-weight: 700;
+    font-size : 15px;
+    border: 2px solid #CDCDCD;
 }
 
 button:hover {
-    background-color: #623453;
-    color: white
+    background-color: #623453 !important;
+    color: white;
+}
+
+#title {
+    color: #395aa6;
 }

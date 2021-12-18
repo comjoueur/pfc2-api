@@ -5,7 +5,7 @@ import secrets
 from sklearn.cluster import KMeans
 import numpy as np
 
-from pfc1.utils import euclidian_distance, get_point_proyection
+from pfc2.utils import euclidian_distance, get_point_proyection
 
 
 class Client(models.Model):
@@ -66,6 +66,70 @@ class Client(models.Model):
         for button in client_buttons:
             centroid = self.get_centroid_per_button(touches_button[button.id], weighted, num_clusters)
             centroids.append((centroid, button))
+        return centroids
+
+    def get_color_last_touches(self, weighted=False):
+        touches = self.touches.order_by('-created')[:self.NUM_LAST_TOUCHES]
+        touches_button = {}
+        client_buttons = self.buttons.all()
+        for button in client_buttons:
+            touches_button[button.id] = []
+        for touch in touches:
+            if touch.button:
+                touches_button[touch.button.id].append(touch)
+        centroids = []
+        for button in client_buttons:
+            button = Button.objects.filter(id=button.id).first()
+            touches, mod_button = self.get_touches_per_button(button, weighted)
+            button.color = mod_button.modificated_color
+        return centroids
+
+    def get_shade_last_touches(self, weighted=False):
+        touches = self.touches.order_by('-created')[:self.NUM_LAST_TOUCHES]
+        touches_button = {}
+        client_buttons = self.buttons.all()
+        for button in client_buttons:
+            touches_button[button.id] = []
+        for touch in touches:
+            if touch.button:
+                touches_button[touch.button.id].append(touch)
+        centroids = []
+        for button in client_buttons:
+            button = Button.objects.filter(id=button.id).first()
+            touches, mod_button = self.get_touches_per_button(button, weighted)
+            button.shade_direction = mod_button.modificated_color
+        return centroids
+
+    def get_border_last_touches(self, weighted=False):
+        touches = self.touches.order_by('-created')[:self.NUM_LAST_TOUCHES]
+        touches_button = {}
+        client_buttons = self.buttons.all()
+        for button in client_buttons:
+            touches_button[button.id] = []
+        for touch in touches:
+            if touch.button:
+                touches_button[touch.button.id].append(touch)
+        centroids = []
+        for button in client_buttons:
+            button = Button.objects.filter(id=button.id).first()
+            touches, mod_button = self.get_touches_per_button(button, weighted)
+            button.border_size = mod_button.modificated_border
+        return centroids
+
+    def get_transparency_last_touches(self, weighted=False):
+        touches = self.touches.order_by('-created')[:self.NUM_LAST_TOUCHES]
+        touches_button = {}
+        client_buttons = self.buttons.all()
+        for button in client_buttons:
+            touches_button[button.id] = []
+        for touch in touches:
+            if touch.button:
+                touches_button[touch.button.id].append(touch)
+        centroids = []
+        for button in client_buttons:
+            button = Button.objects.filter(id=button.id).first()
+            touches, mod_button = self.get_touches_per_button(button, weighted)
+            button.transparency = mod_button.modificated_transparency
         return centroids
 
     def get_centroids_button_touches(self, weighted=False, num_clusters=None):
@@ -156,6 +220,11 @@ class Button(models.Model):
     kind = models.CharField(null=True, blank=True, max_length=32, choices=KIND_BUTTON_CHOICES)
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='buttons')
     size = models.IntegerField(default=DEFAULT_BUTTON_SIZE)
+    encode_shade = models.CharField(max_length=430, default="0_8_15_0.2")
+    shade_direction = models.CharField(max_length=128, default="LEFT")
+    encode_background_color = models.CharField(max_length=128, default="89_133_234")
+    transparency = models.DecimalField(default=0, decimal_places=2, max_digits=10)
+    border_size = models.DecimalField(default=1.2, decimal_places=2, max_digits=10)
 
     @property
     def center(self):

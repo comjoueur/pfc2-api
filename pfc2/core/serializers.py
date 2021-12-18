@@ -1,7 +1,7 @@
 
 from rest_framework import serializers
 
-from pfc1.core.models import Client
+from pfc2.core.models import Client
 
 
 class ClientSerializer(serializers.ModelSerializer):

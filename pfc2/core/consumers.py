@@ -1,10 +1,10 @@
 
 import json
 from channels.generic.websocket import WebsocketConsumer
-from pfc1.core.models import Client, Touch, Button
+from pfc2.core.models import Client, Touch, Button
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-from pfc1 import utils
+from pfc2 import utils
 
 
 class ActionConsumer(WebsocketConsumer):

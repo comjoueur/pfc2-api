@@ -1,4 +1,4 @@
-# PFC1-API
+# PFC2-API
 
 Project make to manage pacman game with mobile virtual controller
 
@@ -21,6 +21,6 @@ $ python manage.py runserver 0.0.0.0:8000
 ## Connect Instance EC2
 
 ```sh
-$ chmod 400 pfc1-keys.pem
-$ ssh -i "pfc1-keys.pem" ubuntu@ec2-18-212-60-187.compute-1.amazonaws.com
+$ chmod 400 pfc2-keys.pem
+$ ssh -i "pfc2-keys.pem" ubuntu@ec2-18-212-60-187.compute-1.amazonaws.com
 ```

@@ -1,7 +1,7 @@
 
 from django.urls import path, include
-from pfc1.core import views
-from pfc1.core import consumers
+from pfc2.core import views
+from pfc2.core import consumers
 
 
 urlpatterns = [

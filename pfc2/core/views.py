@@ -4,9 +4,9 @@ from django.shortcuts import render
 from rest_framework.generics import RetrieveAPIView
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-from pfc1 import utils
-from pfc1.core.models import Client
-from pfc1.core.serializers import ClientSerializer
+from pfc2 import utils
+from pfc2.core.models import Client
+from pfc2.core.serializers import ClientSerializer
 
 
 def pacman_view(request):

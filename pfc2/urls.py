@@ -1,4 +1,4 @@
-"""pfc1 URL Configuration
+"""pfc2 URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/3.1/topics/http/urls/
@@ -17,11 +17,11 @@ from django.contrib import admin
 from django.conf import settings
 from django.urls import path, include
 from django.conf.urls.static import static
-from pfc1.core.urls import websocket_urlpatterns as core_ws_patterns
+from pfc2.core.urls import websocket_urlpatterns as core_ws_patterns
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('pfc1.core.urls')),
+    path('', include('pfc2.core.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 websocket_urlpatterns = core_ws_patterns
